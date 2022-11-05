@@ -1,4 +1,6 @@
 import logging
+from struct import pack
+
 from structures import TLV
 from data import Tag
 from response import (
@@ -20,6 +22,16 @@ from cap import get_arqc_req, get_cap_value, VISA_STATIC_IPB
 log = logging.getLogger(__name__)
 
 
+def hexprint_apdu(apdu):
+    r = ""
+    for elem in apdu:
+        if isinstance(elem, list):
+            r += (pack(">B", len(elem))).hex() + "".join(f"{x:02X}" for x in elem)
+        else:
+            r += f" {elem:02X}"
+    return r.upper()
+
+
 class TransmissionProtocol:
     def __init__(self, connection):
         self.c = connection
@@ -28,6 +40,7 @@ class TransmissionProtocol:
         return self.send_apdu(command)
 
     def send_apdu(self, command):
+        log.debug(f"Sending APDU: {hexprint_apdu(command.marshal())}")
         data = self.c.send_apdu(*command.marshal(), check_status=False)
         if data:
             return RAPDU.unmarshal(data)
@@ -99,7 +112,9 @@ class Card:
         ]
         apps = []
         try:
-            res = self.tp.exchange(SelectCommand(aid))
+            print(f"AID: {aid}")
+            res = self.tp.exchange(SelectCommand(list(aid)))
+            print(f"select app {res=}")
 
             # This is a bit of a hack, we transform this response into something which looks
             # like the result from the SFI method, so that callers of list_applications get a
@@ -112,8 +127,8 @@ class Card:
                     }
                 )
             )
-        except ErrorResponse:
-            pass
+        except ErrorResponse as e:
+            print(e)
 
         # Apps may be stored in different records, so iterate through records
         # until we hit an error
