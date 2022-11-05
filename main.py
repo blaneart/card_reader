@@ -4,6 +4,7 @@ import nfc.clf.pn532
 from nfc.tag.tt4 import Type4Tag
 
 from card import Card
+from command import GetDataCommand
 from data import Tag
 
 logging.basicConfig(level=logging.DEBUG)
@@ -75,8 +76,25 @@ def connected(t):
                     f"{(app_data := card.get_application_data(processing_options.data[tag_f][Tag.AFL]))=}"
                 )
 
+            if Tag.LOG_ENTRY in app.data[Tag.FCI][Tag.FCI_PROP].get(
+                Tag.FCI_ISSUER_DISC, {}
+            ):
+                print(
+                    f"{(log_format := card.get_data_item(GetDataCommand.LOG_FORMAT,tag=Tag.LOG_FORMAT))=}"
+                )
+                log_sfi, log_len = app.data[Tag.FCI][Tag.FCI_PROP][Tag.FCI_ISSUER_DISC][
+                    Tag.LOG_ENTRY
+                ]
+                logs = card.read_record(
+                    0,
+                    log_sfi,
+                )
+                print(f"{logs=}")
+
+            print(f"{card.get_metadata()=}")
+
         # print(f"{card.generate_cap_value('0000')=}")
-    print(f"{t=}")
+    # print(f"{t=}")
     return False
 
 

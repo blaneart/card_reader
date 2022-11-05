@@ -23,12 +23,13 @@ log = logging.getLogger(__name__)
 
 
 def hexprint_apdu(apdu):
-    r = ""
-    for elem in apdu:
-        if isinstance(elem, list):
-            r += (pack(">B", len(elem))).hex() + "".join(f"{x:02X}" for x in elem)
-        else:
-            r += f" {elem:02X}"
+    r = "{cla:02x}{ins:02x}{p1:02x}{p2:02x}".format(**apdu)
+    if "data" in apdu:
+        r += (pack(">B", len(apdu["data"]))).hex() + "".join(
+            f"{x:02X}" for x in apdu["data"]
+        )
+    if "mrl" in apdu:
+        r += (pack(">B", apdu["mrl"])).hex() if apdu["mrl"] < 256 else "00"
     return r.upper()
 
 
@@ -41,7 +42,7 @@ class TransmissionProtocol:
 
     def send_apdu(self, command):
         log.debug(f"Sending APDU: {hexprint_apdu(command.marshal())}")
-        data = self.c.send_apdu(*command.marshal(), check_status=False)
+        data = self.c.send_apdu(**command.marshal(), check_status=False)
         if data:
             print(f"Resp data: {data}")
             return RAPDU.unmarshal(data)
@@ -60,7 +61,7 @@ class Card:
 
     def get_pse(self, pse="2PAY.SYS.DDF01"):
         """Get the Payment System Environment (PSE) file"""
-        return self.tp.exchange(SelectCommand(pse, mrl=255))
+        return self.tp.exchange(SelectCommand(pse))
 
     def list_applications(self, pse="2PAY.SYS.DDF01"):
         """List applications on the card"""
@@ -115,7 +116,7 @@ class Card:
         apps = []
         try:
             print(f"AID: {aid}")
-            res = self.tp.exchange(SelectCommand(list(aid), mrl=0))
+            res = self.tp.exchange(SelectCommand(list(aid)))
             print(f"select app {res=}")
 
             # This is a bit of a hack, we transform this response into something which looks
@@ -150,15 +151,17 @@ class Card:
 
     def select_application(self, app):
         try:
-            res = self.tp.exchange(SelectCommand(app, mrl=0))
+            res = self.tp.exchange(SelectCommand(app))
         except ErrorResponse as e:
             raise MissingAppException(e)
         return res
 
-    def get_data_item(self, item, tag):
+    def get_data_item(self, item, tag=None):
         try:
             res = self.tp.exchange(GetDataCommand(item))
-            return res.data[tag]
+            if tag:
+                return res.data[tag]
+            return res
         except ErrorResponse:
             return None
 
