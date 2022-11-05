@@ -178,12 +178,14 @@ class Card:
 
     def get_processing_options(self, pdol=None):
         res = self.tp.exchange(GetProcessingOptions(pdol))
-        if Tag.RMTF1 in res.data:
-            # Response template format 1
-            return {"AIP": res.data[Tag.RMTF1][:2], "AFL": res.data[Tag.RMTF1][2:]}
-        elif Tag.RMTF2 in res.data:
-            # Response template format 2
-            return {"AIP": res.data[Tag.RMTF2][0x82], "AFL": res.data[Tag.RMTF2][0x94]}
+        # if Tag.RMTF1 in res.data:
+        #     # Response template format 1
+        #     return {"AIP": res.data[Tag.RMTF1][:2], "AFL": res.data[Tag.RMTF1][2:]}
+        # elif Tag.RMTF2 in res.data:
+        #     # Response template format 2
+        #     return {"AIP": res.data[Tag.RMTF2][0x82], "AFL": res.data[Tag.RMTF2][0x94]}
+        # else:
+        return res
 
     def get_application_data(self, afl):
         assert len(afl) % 4 == 0

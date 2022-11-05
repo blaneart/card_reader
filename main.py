@@ -48,7 +48,7 @@ def connected(t):
             print(f"selecting app={apps[-1]}")
             print(f"{(app := card.select_application(list(apps[-1][Tag.ADF_NAME])))=}")
             print(
-                f"{card.get_processing_options(pdol=app.data[Tag.FCI][Tag.FCI_PROP][Tag.PDOL])=}"
+                f"{card.get_processing_options(pdol=app.data[Tag.FCI][Tag.FCI_PROP][Tag.PDOL].serialise({(0x9f, 0x66): (0x60, 0, 4, 0)}))=}"
             )
 
         # print(f"{card.generate_cap_value('0000')=}")
