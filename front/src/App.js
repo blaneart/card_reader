@@ -2,6 +2,9 @@ import logo from './logo.svg';
 import './App.css';
 import React, {useState, useEffect} from 'react';
 import { io, Socket } from 'socket.io-client';
+import Alert from '@mui/material/Alert';
+import Snackbar from '@mui/material/Stack';
+import Button from '@mui/material/Button';
 
 import Cleave from 'cleave.js/react';
 const ENDPOINT="http://localhost:5000"
@@ -54,6 +57,16 @@ function App() {
     setCardType(type);
     console.log(type);
 
+  const handleClick = () => {
+    // socket.emit('get_card', 'get_card');
+    console.log("click");
+  }
+  const handleClose = () => {
+    // setLastPong(null);
+    console.log("close");
+  }
+
+
     if(type === "visa") {
       setCardTypeUrl(imageUrls[0]);
       console.log("Visa")
@@ -93,6 +106,7 @@ function App() {
   
     }
   }, [socket])
+
   return (
     <div className="container">
      <form id="form">
@@ -120,6 +134,16 @@ function App() {
 
       <div className="input-container mt">
         <h4>test</h4>
+        <Button variant="outlined" >
+  Card information details
+</Button>
+<Snackbar  autoHideDuration={6000} >
+  
+</Snackbar>
+<Alert severity="error">This is an error message!</Alert>
+<Alert severity="warning">This is a warning message!</Alert>
+<Alert severity="info">This is an information message!</Alert>
+<Alert severity="success">This is a success message!</Alert>
       </div>
          {/* <div className="input-container mt">
              <h4>Enter card number</h4>
