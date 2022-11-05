@@ -192,11 +192,11 @@ ELEMENT_TABLE = [
 # This should be considered non-exhaustive and used with caution.
 # Some cards may provide sensitive data with under issuer-specific tags.
 SENSITIVE_TAGS = {
-    0x5A,  # PAN
-    (0x9F, 0x1F),  # Track1
-    0x57,  # Track2
-    0x56,  # Contains card number/expiry as ASCII (Mastercard prepaid)
-    (0x9F, 0x6B),  # Contains card number as hex (Mastercard prepaid)
+    # 0x5A,  # PAN
+    # (0x9F, 0x1F),  # Track1
+    # 0x57,  # Track2
+    # 0x56,  # Contains card number/expiry as ASCII (Mastercard prepaid)
+    # (0x9F, 0x6B),  # Contains card number as hex (Mastercard prepaid)
 }
 
 # European Payments Council product ID

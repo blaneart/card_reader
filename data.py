@@ -172,7 +172,7 @@ def render_element(tag, value, redact=False):
     if parse == Parse.COUNTRY:
         try:
             return pycountry.countries.get(numeric=str(from_hex_int(value))).alpha_2
-        except ValueError:
+        except (ValueError, AttributeError):
             return "<Invalid country: %s>" % value
     if parse == Parse.CURRENCY:
         return pycountry.currencies.get(numeric=str(from_hex_int(value))).alpha_3

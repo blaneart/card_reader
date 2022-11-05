@@ -38,7 +38,7 @@ def connected(t):
         # r2 = send_apdu(t, SelectCommand(r[Tag.AID]))
         # print(f"{r2=}")
         card = Card(t)
-        print(f"{card.get_pse()=}")
+        # print(f"{card.get_pse('2PAY.SYS.DDF01')=}")
 
         # print(f"{card.list_applications()=}")
         # print(f"{card.get_mf()=}")
@@ -47,9 +47,23 @@ def connected(t):
         if apps:
             print(f"selecting app={apps[-1]}")
             print(f"{(app := card.select_application(list(apps[-1][Tag.ADF_NAME])))=}")
-            print(
-                f"{card.get_processing_options(pdol=app.data[Tag.FCI][Tag.FCI_PROP][Tag.PDOL].serialise({(0x9f, 0x66): (0x60, 0, 4, 0)}))=}"
-            )
+            if Tag.PDOL not in app.data[Tag.FCI][Tag.FCI_PROP]:
+                print(f"{(processing_options := card.get_processing_options())=}")
+            else:
+                print(
+                    f"{(processing_options := card.get_processing_options(pdol=app.data[Tag.FCI][Tag.FCI_PROP][Tag.PDOL].serialise({(0x9f, 0x66): (0x60, 0, 4, 0)})))=}"
+                )
+
+            tag_f = None
+            if Tag.RMTF1 in processing_options.data:
+                tag_f = Tag.RMTF1
+            elif Tag.RMTF2 in processing_options.data:
+                tag_f = Tag.RMTF2
+
+            if tag_f and Tag.AFL in processing_options.data[tag_f]:
+                print(
+                    f"{(app_data := card.get_application_data(processing_options.data[tag_f][Tag.AFL]))=}"
+                )
 
         # print(f"{card.generate_cap_value('0000')=}")
     print(f"{t=}")

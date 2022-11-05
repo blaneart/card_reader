@@ -65,6 +65,7 @@ class WarningResponse(RAPDU):
 
 class ErrorResponse(RAPDU, Exception):
     ERRORS = {
+        (0x67, 0x00): "Wrong length",
         (0x69, 0x83): "Command not allowed; authentication method blocked",
         (0x69, 0x84): "Command not allowed; referenced data invalidated",
         (0x69, 0x85): "Command not allowed; conditions of use not satisfied",

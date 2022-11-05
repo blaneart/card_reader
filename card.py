@@ -43,6 +43,7 @@ class TransmissionProtocol:
         log.debug(f"Sending APDU: {hexprint_apdu(command.marshal())}")
         data = self.c.send_apdu(*command.marshal(), check_status=False)
         if data:
+            print(f"Resp data: {data}")
             return RAPDU.unmarshal(data)
         return data
 
