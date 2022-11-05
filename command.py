@@ -36,16 +36,21 @@ class CAPDU(object):
             assert_valid_byte(val)
 
         # Mandatory header:
-        cmd = [cla, ins, self.p1, self.p2]
+        cmd = {
+            "cla": cla,
+            "ins": ins,
+            "p1": self.p1,
+            "p2": self.p2,
+        }
 
         # Conditional body:
         if self.data is not None:
             # cmd += [len(self.data)]  # Lc
-            cmd += [self.data]
+            cmd["data"] = self.data
 
         # Bytes expected:
         if self.le is not None:
-            cmd += [self.le]  # Le
+            cmd["mrl"] = self.le
 
         return cmd
 
@@ -90,7 +95,7 @@ class SelectCommand(CAPDU):
     name = "Select"
 
     def __init__(
-        self, file_path=None, file_identifier=None, next_occurrence=False, mrl=0
+        self, file_path=None, file_identifier=None, next_occurrence=False, mrl=256
     ):
         if file_path is not None:
             if isinstance(file_path, str):
@@ -141,7 +146,7 @@ class ReadCommand(CAPDU):
             self.p2 = 0x04
 
         self.data = None
-        self.le = 0x00
+        self.le = 256
 
 
 class GetDataCommand(CAPDU):
@@ -162,7 +167,7 @@ class GetDataCommand(CAPDU):
         self.p1 = obj[0]
         self.p2 = obj[1]
         self.data = None
-        self.le = 0x00
+        self.le = 256
 
 
 class VerifyCommand(CAPDU):
@@ -228,4 +233,4 @@ class GetProcessingOptions(CAPDU):
         else:
             self.data = [0x83, len(pdol)]
             self.data.extend(pdol)
-        self.le = 0x00
+        self.le = 256
