@@ -183,7 +183,7 @@ ELEMENT_TABLE = [
     ),
     ((0x9F, 0x6E), "Third Party Data", Parse.BYTES, None),
     (0xA5, "FCI Proprietary Template", Parse.BYTES, "FCI_PROP"),
-    ((0xBF, 0x0C), "FCI Issuer Discretionary Data", Parse.BYTES, None),
+    ((0xBF, 0x0C), "FCI Issuer Discretionary Data", Parse.BYTES, "FCI_ISSUER_DISC"),
 ]
 
 

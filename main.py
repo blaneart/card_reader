@@ -38,6 +38,8 @@ def connected(t):
         # print(f"{card.get_pse()=}")
 
         # print(f"{card.list_applications()=}")
+        print(f"{card.get_mf()=}")
+        print(f"{card.get_metadata()=}")
         print(f"{card.list_applications(pse='2PAY.SYS.DDF01')=}")
 
         # print(f"{card.generate_cap_value('0000')=}")

@@ -44,14 +44,14 @@ class Card:
         """Get the master file (MF)."""
         return self.tp.exchange(SelectCommand(file_identifier=[0x3F, 0x00]))
 
-    def get_pse(self, pse="1PAY.SYS.DDF01"):
+    def get_pse(self, pse="2PAY.SYS.DDF01"):
         """Get the Payment System Environment (PSE) file"""
         return self.tp.exchange(SelectCommand(pse))
 
-    def list_applications(self, pse="1PAY.SYS.DDF01"):
+    def list_applications(self, pse="2PAY.SYS.DDF01"):
         """List applications on the card"""
         try:
-            return self._list_applications_sfi(pse=pse)
+            return self._list_applications(pse=pse)
         except ErrorResponse:
             return self._list_applications_static_aid()
 
@@ -86,7 +86,7 @@ class Card:
                 continue
         return apps
 
-    def _list_applications_sfi(self, pse="1PAY.SYS.DDF01"):
+    def _list_applications(self, pse="2PAY.SYS.DDF01"):
         """List applications on the card using the SFI method.
 
         This fetches the SFI (short file identifier) from the PSE (Payment System Environment)
@@ -94,20 +94,38 @@ class Card:
         """
         pse = self.get_pse(pse=pse)
         print(f"{pse=}")
-        sfi = pse.data[Tag.FCI][Tag.FCI_PROP][Tag.SFI][0]
+        aid = pse.data[Tag.FCI][Tag.FCI_PROP][Tag.FCI_ISSUER_DISC][Tag.APP][
+            Tag.ADF_NAME
+        ]
         apps = []
+        try:
+            res = self.tp.exchange(SelectCommand(aid))
+
+            # This is a bit of a hack, we transform this response into something which looks
+            # like the result from the SFI method, so that callers of list_applications get a
+            # consistent result.
+            apps.append(
+                TLV(
+                    {
+                        Tag.ADF_NAME: res.data[Tag.FCI][Tag.DF],
+                        Tag.APP_LABEL: res.data[Tag.FCI][Tag.FCI_PROP][Tag.APP_LABEL],
+                    }
+                )
+            )
+        except ErrorResponse:
+            pass
 
         # Apps may be stored in different records, so iterate through records
         # until we hit an error
-        for i in range(1, 31):
-            try:
-                res = self.read_record(i, sfi)
-            except ErrorResponse:
-                break
-            new_apps = res.data[Tag.RECORD][Tag.APP]
-            if type(new_apps) is not list:
-                new_apps = [new_apps]
-            apps += new_apps
+        # for i in range(1, 31):
+        #     try:
+        #         res = self.read_record(i, sfi)
+        #     except ErrorResponse:
+        #         break
+        #     new_apps = res.data[Tag.RECORD][Tag.APP]
+        #     if type(new_apps) is not list:
+        #         new_apps = [new_apps]
+        #     apps += new_apps
         return apps
 
     def read_record(self, record_number, sfi=None):
