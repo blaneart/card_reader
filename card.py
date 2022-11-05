@@ -60,7 +60,7 @@ class Card:
 
     def get_pse(self, pse="2PAY.SYS.DDF01"):
         """Get the Payment System Environment (PSE) file"""
-        return self.tp.exchange(SelectCommand(pse))
+        return self.tp.exchange(SelectCommand(pse, mrl=255))
 
     def list_applications(self, pse="2PAY.SYS.DDF01"):
         """List applications on the card"""
@@ -108,13 +108,14 @@ class Card:
         """
         pse = self.get_pse(pse=pse)
         print(f"{pse=}")
-        aid = pse.data[Tag.FCI][Tag.FCI_PROP][Tag.FCI_ISSUER_DISC][Tag.APP][
-            Tag.ADF_NAME
-        ]
+        app_tag = pse.data[Tag.FCI][Tag.FCI_PROP][Tag.FCI_ISSUER_DISC][Tag.APP]
+        if isinstance(app_tag, list):
+            app_tag = app_tag[0]  # TODO!
+        aid = app_tag[Tag.ADF_NAME]
         apps = []
         try:
             print(f"AID: {aid}")
-            res = self.tp.exchange(SelectCommand(list(aid)))
+            res = self.tp.exchange(SelectCommand(list(aid), mrl=0))
             print(f"select app {res=}")
 
             # This is a bit of a hack, we transform this response into something which looks
@@ -149,7 +150,7 @@ class Card:
 
     def select_application(self, app):
         try:
-            res = self.tp.exchange(SelectCommand(app))
+            res = self.tp.exchange(SelectCommand(app, mrl=0))
         except ErrorResponse as e:
             raise MissingAppException(e)
         return res

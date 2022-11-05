@@ -1,16 +1,14 @@
-import nfc
-import ndef
-from threading import Thread
-from nfc.clf import RemoteTarget
-from nfc.tag.tt4 import Type4Tag
 import logging
 
-from command import SelectCommand
-from data import Tag
-from response import RAPDU
+import nfc.clf.pn532
+from nfc.tag.tt4 import Type4Tag
+
 from card import Card
+from data import Tag
 
 logging.basicConfig(level=logging.DEBUG)
+# nfc.clf.log.setLevel(logging.DEBUG)
+# nfc.clf.pn532.log.setLevel(logging.DEBUG)
 
 # def beam(llc):
 #    snep_client = nfc.snep.SnepClient(llc)
@@ -32,18 +30,30 @@ def connected(t):
         # print("sending apdu")
         #
         # r = send_apdu(t, SelectCommand(b"2PAY.SYS.DDF01"))
-        # # r = tag.send_apdu(0x00, 0xA4, 0x04, 0x00, b"2PAY.SYS.DDF01", 0x00)
+        # r = t.send_apdu(
+        #     0x00, 0xA4, 0x04, 0x00, b"2PAY.SYS.DDF01", 0x00, check_status=False
+        # )
+
+        # r = t.send_apdu(
+        #     0x00, 0xA4, 0x04, 0x00, b"2PAY.SYS.DDF01", 0x00, check_status=True
+        # )
+
         # print(f"{r=}")
+        # return
         #
         # r2 = send_apdu(t, SelectCommand(r[Tag.AID]))
         # print(f"{r2=}")
         card = Card(t)
         # print(f"{card.get_pse('2PAY.SYS.DDF01')=}")
+        # return
 
         # print(f"{card.list_applications()=}")
         # print(f"{card.get_mf()=}")
         # print(f"{card.get_metadata()=}")
+
+        # card = Card(t)
         print(f"{(apps := card.list_applications())=}")
+        # print(f"{(apps := card.list_applications('1PAY.SYS.DDF01'))=}")
         if apps:
             print(f"selecting app={apps[-1]}")
             print(f"{(app := card.select_application(list(apps[-1][Tag.ADF_NAME])))=}")
@@ -71,6 +81,7 @@ def connected(t):
 
 
 with nfc.ContactlessFrontend("tty") as clf:
+    clf.device.log.setLevel(logging.DEBUG)
     try:
         clf.connect(rdwr={"on-connect": connected})
     except KeyboardInterrupt:

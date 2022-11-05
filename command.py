@@ -89,7 +89,9 @@ class SelectCommand(CAPDU):
 
     name = "Select"
 
-    def __init__(self, file_path=None, file_identifier=None, next_occurrence=False):
+    def __init__(
+        self, file_path=None, file_identifier=None, next_occurrence=False, mrl=0
+    ):
         if file_path is not None:
             if isinstance(file_path, str):
                 self.data = [ord(c) for c in file_path]
@@ -105,7 +107,7 @@ class SelectCommand(CAPDU):
         else:
             self.p2 = 0x00  # First or only occurrence
 
-        self.le = 0x00
+        self.le = mrl or 0x00
 
     def __repr__(self):
         data = " ".join(["%02x" % i for i in self.data])
