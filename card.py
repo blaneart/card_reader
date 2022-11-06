@@ -108,7 +108,7 @@ class Card:
         file, and uses it to locate all the apps on the card.
         """
         pse = self.get_pse(pse=pse)
-        print(f"{pse=}")
+        # print(f"{pse=}")
         app_tag = pse.data[Tag.FCI][Tag.FCI_PROP][Tag.FCI_ISSUER_DISC][Tag.APP]
         if isinstance(app_tag, list):
             app_tag = app_tag[0]  # TODO!
@@ -117,7 +117,7 @@ class Card:
         try:
             print(f"AID: {aid}")
             res = self.tp.exchange(SelectCommand(list(aid)))
-            print(f"select app {res=}")
+            # print(f"select app {res=}")
 
             # This is a bit of a hack, we transform this response into something which looks
             # like the result from the SFI method, so that callers of list_applications get a
@@ -125,8 +125,10 @@ class Card:
             apps.append(
                 TLV(
                     {
-                        Tag.ADF_NAME: res.data[Tag.FCI][Tag.DF],
-                        Tag.APP_LABEL: res.data[Tag.FCI][Tag.FCI_PROP][Tag.APP_LABEL],
+                        Tag(Tag.ADF_NAME): res.data[Tag.FCI][Tag.DF],
+                        Tag(Tag.APP_LABEL): res.data[Tag.FCI][Tag.FCI_PROP][
+                            Tag.APP_LABEL
+                        ],
                     }
                 )
             )
