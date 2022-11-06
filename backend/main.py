@@ -3,7 +3,11 @@ from flask import Flask, render_template, request, jsonify
 from flask_socketio import SocketIO
 
 app = Flask(__name__)
-socketio = SocketIO(app, cors_allowed_origins="*")
+async_mode = None
+
+app.config['SECRET_KEY'] = 'secret!'
+
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode=async_mode)
 
 @socketio.on('message')
 def handle_message(data):
@@ -15,7 +19,6 @@ def test_connect():
 
 @socketio.on('disconnect')
 def test_disconnect():
-    thread_map[request.sid] = False
     print('Client disconnected')
 
 
