@@ -29,6 +29,8 @@ function App() {
 
   // const [isConnected, setIsConnected] = useState(socket.connected);
   const [lastPong, setLastPong] = useState(null);
+  const [cardDetails, setCardDetails] = useState('Transactions');;
+  const [securityLevel, setSecurity] = useState("Info");;
   const socket = io(ENDPOINT);
 
   const handleNum = (e) => {
@@ -51,17 +53,26 @@ function App() {
       if (message.card_number !== null){
         setCreditCardNum(message.card_number)
       }
+      // if (message.details !== null) {
+      //   setCardDetails(message.details)
+      // }
+      if (message.lenght() > 300) {
+        setSecurity("Warning")
+      } else if (message.lenght() < 100) {
+        setSecurity("Error")
+      }
     })
-  }, [expireYear, creditCardNum])
+  }, [expireYear, creditCardNum, cardDetails])
+  
   const handleType = (type) => {
     setCardType(type);
     console.log(type);
 
-  const handleClick = () => {
+  const handleClick = (e) => {
     // socket.emit('get_card', 'get_card');
     console.log("click");
   }
-  const handleClose = () => {
+  const handleClose = (e) => {
     // setLastPong(null);
     console.log("close");
   }
@@ -133,17 +144,21 @@ function App() {
          </div>
 
       <div className="input-container mt">
-        <h4>test</h4>
-        <Button variant="outlined" >
-  Card information details
-</Button>
-<Snackbar  autoHideDuration={6000} >
   
+        <Button variant="outlined" >
+ Additional Information
+</Button>
+{/* <Snackbar  autoHideDuration={6000} onClose={handleClose}>
+  <Alert onClose={handleClose} severity="success" sx={{ width: '100%' }}>
+    This is a success message!
+  </Alert>
 </Snackbar>
-<Alert severity="error">This is an error message!</Alert>
-<Alert severity="warning">This is a warning message!</Alert>
-<Alert severity="info">This is an information message!</Alert>
-<Alert severity="success">This is a success message!</Alert>
+<Alert severity="error">This is an error message!</Alert> */}
+
+{securityLevel == "Warning" && <Alert severity="warning"> Trasations: {cardDetails} </Alert>}
+{securityLevel == "Info" && <Alert severity="info">This card has more information than you think</Alert>}
+{securityLevel == "Error" && <Alert severity="success">This is safe card </Alert>}
+
       </div>
          {/* <div className="input-container mt">
              <h4>Enter card number</h4>
