@@ -1,7 +1,7 @@
 import json
 import logging
 from textwrap import wrap
-
+import requests
 import nfc.clf.pn532
 from nfc.tag.tt4 import Type4Tag
 
@@ -153,18 +153,24 @@ def connected(t):
             print(f"{(metadata := card.get_metadata())=}")
             payload |= metadata
 
-            print(payload)
-            print(json.dumps(payload))
+        print(payload)
+        url = "http://localhost:5000/card_info"
+        x = requests.post(url, json=payload)
 
         # print(f"{card.generate_cap_value('0000')=}")
-        return True
+        return False
 
     return False
 
 
 with nfc.ContactlessFrontend("tty") as clf:
     clf.device.log.setLevel(logging.DEBUG)
-    try:
-        clf.connect(rdwr={"on-connect": connected})
-    except KeyboardInterrupt:
-        exit()
+    while True:
+        try:
+            clf.connect(rdwr={"on-connect": connected})
+            from time import sleep
+            sleep(5)
+        except KeyboardInterrupt:
+            exit()
+        except Exception:
+            pass

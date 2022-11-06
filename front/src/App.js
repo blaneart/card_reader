@@ -16,7 +16,28 @@ const imageUrls = [
   "https://cdn4.iconfinder.com/data/icons/simple-peyment-methods/512/diners_club-512.png",
   "https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/JCB_logo.svg/1280px-JCB_logo.svg.png"
 ]
+function addSpace(str) {
+  // Create a variable to store the eventual result
+  let result = '';
+  let i = 1;
+  for (const char of str) {
+    // On each iteration, add the character and a space
+    // to the variable
 
+    if (i === 4)
+    {
+    result += char + ' ';
+    i = 0;
+    }
+    else {
+      result += char
+    }
+    i += 1;
+  }
+
+  // Remove the space from the last character
+  return result.trimEnd();
+}
 // const socket = io(ENDPOINT);
 
 function App() {
@@ -40,29 +61,36 @@ function App() {
   useEffect(() => {
     console.log('lol');
     socket.on('update_card', function(message) { 
+      // console.log(JSON.parse(message))
       console.log(message)
-      if (message.expiration !== null)
+      // message = JSON.parse(message)
+      if (message.expiration_date)
       {
-        const answer_array = message.expiration.split('/');
+        const answer_array = message.expiration_date.split('/');
         setExpireMonth(answer_array[1])
         setExpireYear('20' + answer_array[0])
       }
-      if (message.type !== null) {
-        handleType(message.type)
+      if (message.app_labels) {
+        console.log(typeof(message.app_labels[0]));
+        handleType(message.app_labels[0].toLowerCase())
       }
-      if (message.card_number !== null){
-        setCreditCardNum(message.card_number)
+      if (message.pan){
+        console.log(addSpace(message.pan))
+        setCreditCardNum(addSpace(message.pan))
       }
-      // if (message.details !== null) {
-      //   setCardDetails(message.details)
+      if (message.card_holder){
+        setCardHolder(message.card_holder);
+      }
+      else {
+        setCardHolder("Name Not Found")
+      }
+      // if (message.length() > 300) {
+      //   setSecurity("Warning")
+      // } else if (message.length() < 100) {
+      //   setSecurity("Error")
       // }
-      if (message.lenght() > 300) {
-        setSecurity("Warning")
-      } else if (message.lenght() < 100) {
-        setSecurity("Error")
-      }
     })
-  }, [expireYear, creditCardNum, socket])
+  }, [expireYear, creditCardNum, cardHolder, cardType, socket])
   const handleType = (type) => {
     setCardType(type);
     console.log(type);
@@ -186,3 +214,6 @@ function App() {
 }
 
 export default App;
+
+
+// {'app_labels': ['DEBIT MASTERCARD'], 'card_type': '<ASRPD: Electronic Product Identification: Debit>', 'effective_date': '20/03/01', 'expiration_date': '25/02/28', 'issuer_country_code': 'FR', 'pan': '5355842199716601', 'currency': 'EUR', 'logs': [{'amount': 654, 'country_code': 'FR', 'date': '20/01/01', 'transaction_counter': 229}], 'pin_retries': 3}
