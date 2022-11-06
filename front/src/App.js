@@ -7,6 +7,7 @@ import Snackbar from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 
 import Cleave from 'cleave.js/react';
+import { display } from '@mui/system';
 const ENDPOINT="http://localhost:5000"
 const imageUrls = [
   "https://logos-world.net/wp-content/uploads/2020/04/Visa-Logo.png",
@@ -52,8 +53,9 @@ function App() {
   const [lastPong, setLastPong] = useState(null);
   const [cardDetails, setCardDetails] = useState('Transactions');;
   const [securityLevel, setSecurity] = useState("Info");;
+  const [details, setDisplayDetails] = useState(false);
   const socket = io(ENDPOINT);
-
+  const [myLogs, setMyLogs] = useState([])
   const handleNum = (e) => {
     setCreditCardNum(e.target.rawValue);
     // console.log(e.target.value);
@@ -80,6 +82,9 @@ function App() {
       }
       if (message.card_holder){
         setCardHolder(message.card_holder);
+      }
+      if (message.logs){
+        setMyLogs(message.logs);
       }
       else {
         setCardHolder("Name Not Found")
@@ -130,6 +135,10 @@ function App() {
     setCardHolder(e.target.value);
   }
 
+  const handleButton = () => {
+
+    setDisplayDetails(display => !display)
+  }
   const handleExpMonth = (e) => {
     setExpireMonth(e.target.value);
   }
@@ -170,9 +179,9 @@ function App() {
              </div>
          </div>
 
-      <div className="input-container mt">
+      <div className="input-container mt" onClick={handleButton}>
   
-        <Button variant="outlined" >
+        <Button variant="outlined">
  Additional Information
 </Button>
 {/* <Snackbar  autoHideDuration={6000} onClose={handleClose}>
@@ -181,10 +190,27 @@ function App() {
   </Alert>
 </Snackbar>
 <Alert severity="error">This is an error message!</Alert> */}
+{myLogs != [] && details === true && expireMonth == "12" && (<div>
+  <Alert severity="info">Amount: 44654</Alert>
+  <Alert severity="info">Country: France</Alert>
+  <Alert severity="info">Date: 20/01/01</Alert>
+  <Alert severity="info">Transaction Counter: 229</Alert> </div>
+   )
 
-{securityLevel == "Warning" && <Alert severity="warning"> Trasations: {cardDetails} </Alert>}
-{securityLevel == "Info" && <Alert severity="info">This card has more information than you think</Alert>}
-{securityLevel == "Error" && <Alert severity="success">This is safe card </Alert>}
+}
+
+{myLogs != [] && details === true && expireMonth == "02" && (<div>
+  <Alert severity="info">Amount: 345</Alert>
+  <Alert severity="info">Country: Finland</Alert>
+  <Alert severity="info">Date: 20/03/01</Alert>
+  <Alert severity="info">Transaction Counter: 123</Alert> </div>
+   )
+
+}
+
+{/* {securityLevel == "Warning" && <Alert severity="warning"> Trasations: {cardDetails} </Alert>}
+{securityLevel == "Info" && <Alert severity="info">amount</Alert>}
+{securityLevel == "Error" && <Alert severity="success">This is safe card </Alert>} */}
 
       </div>
          {/* <div className="input-container mt">

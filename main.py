@@ -14,7 +14,7 @@ from data import (
 )
 from structures import TLV
 
-logging.basicConfig(level=logging.DEBUG)
+# logging.basicConfig(level=logging.DEBUG)
 # nfc.clf.log.setLevel(logging.DEBUG)
 # nfc.clf.pn532.log.setLevel(logging.DEBUG)
 
@@ -167,7 +167,10 @@ with nfc.ContactlessFrontend("tty") as clf:
     clf.device.log.setLevel(logging.DEBUG)
     while True:
         try:
-            clf.connect(rdwr={"on-connect": connected})
+            t = clf.connect(
+                rdwr={"on-connect": connected}
+                )
+            # connected(t)  
             from time import sleep
             sleep(5)
         except KeyboardInterrupt:
