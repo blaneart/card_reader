@@ -88,13 +88,13 @@ function App() {
       }
       else {
         setCardHolder("Name Not Found")
-      }
       // if (message.length() > 300) {
       //   setSecurity("Warning")
       // } else if (message.length() < 100) {
       //   setSecurity("Error")
       // }
-    })
+    }}
+    )
   }, [expireYear, creditCardNum, cardHolder, cardType, socket])
   const handleType = (type) => {
     setCardType(type);
@@ -130,6 +130,8 @@ function App() {
       setCardTypeUrl(imageUrls[5]);
     }
   }
+
+  const testCard =  {'app_labels': ['DEBIT MASTERCARD'], 'card_type': '<ASRPD: Electronic Product Identification: Debit>', 'effective_date': '20/03/01', 'expiration_date': '25/02/28', 'issuer_country_code': 'FR', 'pan': '5355842199716601', 'currency': 'EUR', 'logs': [{'amount': 654, 'country_code': 'FR', 'date': '20/01/01', 'transaction_counter': 229}], 'pin_retries': 3}
   
   const handleCardHolder = (e) => {
     setCardHolder(e.target.value);
@@ -211,7 +213,6 @@ function App() {
 {/* {securityLevel == "Warning" && <Alert severity="warning"> Trasations: {cardDetails} </Alert>}
 {securityLevel == "Info" && <Alert severity="info">amount</Alert>}
 {securityLevel == "Error" && <Alert severity="success">This is safe card </Alert>} */}
-
       </div>
          {/* <div className="input-container mt">
              <h4>Enter card number</h4>
@@ -242,4 +243,3 @@ function App() {
 export default App;
 
 
-// {'app_labels': ['DEBIT MASTERCARD'], 'card_type': '<ASRPD: Electronic Product Identification: Debit>', 'effective_date': '20/03/01', 'expiration_date': '25/02/28', 'issuer_country_code': 'FR', 'pan': '5355842199716601', 'currency': 'EUR', 'logs': [{'amount': 654, 'country_code': 'FR', 'date': '20/01/01', 'transaction_counter': 229}], 'pin_retries': 3}
