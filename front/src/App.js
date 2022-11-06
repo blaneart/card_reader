@@ -50,8 +50,10 @@ function App() {
 
   // const [isConnected, setIsConnected] = useState(socket.connected);
   const [lastPong, setLastPong] = useState(null);
-  const [cardDetails, setCardDetails] = useState('Transactions');;
-  const [securityLevel, setSecurity] = useState("Info");;
+  const [cardDetails, setCardDetails] = useState('Transactions');
+  const [securityLevel, setSecurity] = useState("Info");
+  const [details, setDisplayDetails] = useState(false);
+  const [logDetails, setLogDetails] = useState([]);
   const socket = io(ENDPOINT);
 
   const handleNum = (e) => {
@@ -81,8 +83,8 @@ function App() {
       if (message.card_holder){
         setCardHolder(message.card_holder);
       }
-      else {
-        setCardHolder("Name Not Found")
+      if (message.logs) {
+        setLogDetails(message.logs);
       }
       // if (message.length() > 300) {
       //   setSecurity("Warning")
@@ -125,6 +127,8 @@ function App() {
       setCardTypeUrl(imageUrls[5]);
     }
   }
+
+  const testCard =  {'app_labels': ['DEBIT MASTERCARD'], 'card_type': '<ASRPD: Electronic Product Identification: Debit>', 'effective_date': '20/03/01', 'expiration_date': '25/02/28', 'issuer_country_code': 'FR', 'pan': '5355842199716601', 'currency': 'EUR', 'logs': [{'amount': 654, 'country_code': 'FR', 'date': '20/01/01', 'transaction_counter': 229}], 'pin_retries': 3}
   
   const handleCardHolder = (e) => {
     setCardHolder(e.target.value);
@@ -172,7 +176,7 @@ function App() {
 
       <div className="input-container mt">
   
-        <Button variant="outlined" >
+        <Button variant="outlined" onClick={setCardDetails(true)} >
  Additional Information
 </Button>
 {/* <Snackbar  autoHideDuration={6000} onClose={handleClose}>
@@ -181,7 +185,14 @@ function App() {
   </Alert>
 </Snackbar>
 <Alert severity="error">This is an error message!</Alert> */}
-
+{details && testCard.logs.map((log) => (
+  <div>
+    <p>Amount: {log.amount}</p>
+    <p>Country Code: {log.country_code}</p>
+    <p>Date: {log.date}</p>
+    <p>Transaction Counter: {log.transaction_counter}</p>
+  </div>
+))}
 {securityLevel == "Warning" && <Alert severity="warning"> Trasations: {cardDetails} </Alert>}
 {securityLevel == "Info" && <Alert severity="info">This card has more information than you think</Alert>}
 {securityLevel == "Error" && <Alert severity="success">This is safe card </Alert>}
@@ -216,4 +227,3 @@ function App() {
 export default App;
 
 
-// {'app_labels': ['DEBIT MASTERCARD'], 'card_type': '<ASRPD: Electronic Product Identification: Debit>', 'effective_date': '20/03/01', 'expiration_date': '25/02/28', 'issuer_country_code': 'FR', 'pan': '5355842199716601', 'currency': 'EUR', 'logs': [{'amount': 654, 'country_code': 'FR', 'date': '20/01/01', 'transaction_counter': 229}], 'pin_retries': 3}
