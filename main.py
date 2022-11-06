@@ -1,8 +1,9 @@
-import json
 import logging
 from textwrap import wrap
-import requests
+from time import sleep
+
 import nfc.clf.pn532
+import requests
 from nfc.tag.tt4 import Type4Tag
 
 from card import Card
@@ -13,6 +14,7 @@ from data import (
     render_element,
 )
 from structures import TLV
+
 
 # logging.basicConfig(level=logging.DEBUG)
 # nfc.clf.log.setLevel(logging.DEBUG)
@@ -135,10 +137,17 @@ def connected(t):
                 for i in range(1, log_len + 1):
                     try:
                         l = card.read_record(i, log_sfi)
-                        logs.append(l)
+                        logs.append(l.data.raw_data)
                     except Exception:
                         break
                 print(f"{logs=}")
+
+                try:
+                    parsed_logs = parse_logs(logs, log_format.data.raw_data)
+                except Exception:
+                    parsed_logs = []
+
+                print(f"{parsed_logs=}")
 
                 # TODO
                 payload["logs"] = [
@@ -167,11 +176,8 @@ with nfc.ContactlessFrontend("tty") as clf:
     clf.device.log.setLevel(logging.DEBUG)
     while True:
         try:
-            t = clf.connect(
-                rdwr={"on-connect": connected}
-                )
-            # connected(t)  
-            from time import sleep
+            t = clf.connect(rdwr={"on-connect": connected})
+
             sleep(5)
         except KeyboardInterrupt:
             exit()

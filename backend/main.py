@@ -1,13 +1,19 @@
 import json
-from flask import Flask, render_template, request, jsonify
+
+from flask import (
+    Flask,
+    jsonify,
+    request,
+)
 from flask_socketio import SocketIO
 
 app = Flask(__name__)
 async_mode = None
 
-app.config['SECRET_KEY'] = 'secret!'
+app.config["SECRET_KEY"] = "secret!"
 
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode=async_mode)
+thread_map = {}
 
 
 @socketio.on("message")
@@ -32,6 +38,11 @@ def send_card_info_socket():
     print(record)
     socketio.emit("update_card", record)
     return jsonify(record)
+
+
+@app.route("/")
+def hello():
+    return "Hello World!"
 
 
 if __name__ == "__main__":

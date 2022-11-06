@@ -40,6 +40,8 @@ class TLV(OrderedDict):
         tlv = cls()
         i = 0
 
+        tlv.raw_data = data
+
         if len(data) < 3:
             # A valid TLV record is at least three bytes, anything less is probably a bug.
             # I've seen some cards present this (with a TLV of simply [0x61]), so silently ignore.
