@@ -38,7 +38,7 @@ function App() {
     // console.log(e.target.value);
   }
   useEffect(() => {
-    console.log('lol')
+    console.log('lol');
     socket.on('update_card', function(message) { 
       console.log(message)
       if (message.expiration !== null)
@@ -62,8 +62,7 @@ function App() {
         setSecurity("Error")
       }
     })
-  }, [expireYear, creditCardNum, cardDetails])
-  
+  }, [expireYear, creditCardNum, socket])
   const handleType = (type) => {
     setCardType(type);
     console.log(type);
@@ -113,10 +112,10 @@ function App() {
 
   useEffect(() => {
     return () => {
-      socket?.disconnect();
+
   
     }
-  }, [socket])
+  }, [])
 
   return (
     <div className="container">
